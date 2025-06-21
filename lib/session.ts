@@ -13,26 +13,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      try {
-        await connectMongoose();
-        const sessionUser = await UserModel.findOne({ email: session.user?.email });
-
-        if (sessionUser) {
-          session.user = {
-            ...(session.user as {
-              name: string;
-              email: string;
-              image?: string;
-            }),
-            id: sessionUser._id.toString(),
-            avatarUrl: sessionUser.avatarUrl,
-          };
-        }
-      } catch (error) {
-        console.error("Session callback error:", error);
+    async jwt({ token, user }) {
+      // Persist custom user info into token
+      if (user) {
+        token.id = (user as any).id;
+        token.avatarUrl = (user as any).avatarUrl;
       }
+      return token;
+    },
 
+    async session({ session, token }) {
+      // Attach custom fields from token to session
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.avatarUrl = token.avatarUrl as string;
+      }
       return session;
     },
 
@@ -43,11 +38,16 @@ export const authOptions: NextAuthOptions = {
         const existingUser = await UserModel.findOne({ email: user.email });
 
         if (!existingUser) {
-          await UserModel.create({
+          const newUser = await UserModel.create({
             email: user.email,
             name: user.name,
             avatarUrl: user.image,
           });
+          user.id = newUser._id.toString();
+          user.avatarUrl = newUser.avatarUrl;
+        } else {
+          user.id = existingUser._id.toString();
+          user.avatarUrl = existingUser.avatarUrl;
         }
 
         return true;
