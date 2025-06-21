@@ -19,6 +19,15 @@ const nextConfig = {
       "dns": false,
       "child_process": false,
       "tls": false,
+      "aws4": false,
+      "aws-crt": false,
+      "kerberos": false,
+      "snappy": false,
+      "mongodb-client-encryption": false,
+      "@mongodb-js/zstd": false,
+      "@aws-sdk/credential-providers": false,
+      "gcp-metadata": false,
+      "coffee-script": false
     }
     return config
   }

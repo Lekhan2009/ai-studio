@@ -82,13 +82,15 @@ export interface ProjectInterface {
     liveSiteUrl: string;
     githubUrl: string;
     category: string;
-    id: string;
-    createdBy: {
-      name: string;
-      email: string;
-      avatarUrl: string;
-      id: string;
-    };
+}
+
+export interface ProjectForm {
+  title: string;
+  description: string;
+  image: string;
+  liveSiteUrl: string;
+  githubUrl: string;
+  category: string;
 }
 
 export interface UserProfile {

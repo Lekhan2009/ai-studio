@@ -1,4 +1,3 @@
-
 import { connectMongoose } from "./mongodb";
 import Project from "@/models/Project";
 import User from "@/models/User";
@@ -10,7 +9,7 @@ const serverUrl = isProduction ? process.env.NEXTAUTH_URL : 'http://localhost:30
 export const createProject = async (form: ProjectForm, creatorId: string, token: string) => {
   try {
     await connectMongoose();
-    
+
     const user = await User.findById(creatorId);
     if (!user) {
       throw new Error("User not found");
@@ -43,7 +42,7 @@ export const createProject = async (form: ProjectForm, creatorId: string, token:
 export const fetchAllProjects = async (category?: string | null, endCursor?: string | null) => {
   try {
     await connectMongoose();
-    
+
     let query = {};
     if (category && category !== "All") {
       query = { category };
@@ -83,9 +82,9 @@ export const fetchAllProjects = async (category?: string | null, endCursor?: str
 export const getProjectDetails = async (id: string) => {
   try {
     await connectMongoose();
-    
+
     const project = await Project.findById(id).populate('createdBy', 'name email avatarUrl');
-    
+
     if (!project) {
       return { project: null };
     }
@@ -109,12 +108,12 @@ export const getProjectDetails = async (id: string) => {
 export const getUserProjects = async (id: string, last?: number) => {
   try {
     await connectMongoose();
-    
+
     const user = await User.findById(id).populate({
       path: 'projects',
       options: { sort: { createdAt: -1 }, limit: last || 4 }
     });
-    
+
     if (!user) {
       return { user: null };
     }
@@ -148,7 +147,7 @@ export const getUserProjects = async (id: string, last?: number) => {
 export const deleteProject = async (id: string, token: string) => {
   try {
     await connectMongoose();
-    
+
     const project = await Project.findById(id);
     if (!project) {
       throw new Error("Project not found");
@@ -171,7 +170,7 @@ export const deleteProject = async (id: string, token: string) => {
 export const updateProject = async (form: ProjectForm, projectId: string, token: string) => {
   try {
     await connectMongoose();
-    
+
     const project = await Project.findByIdAndUpdate(
       projectId,
       form,
@@ -201,9 +200,9 @@ export const updateProject = async (form: ProjectForm, projectId: string, token:
 export const getUser = async (email: string) => {
   try {
     await connectMongoose();
-    
+
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       return { user: null };
     }
@@ -223,7 +222,7 @@ export const getUser = async (email: string) => {
 export const createUser = async (name: string, email: string, avatarUrl: string) => {
   try {
     await connectMongoose();
-    
+
     const user = await User.create({
       name,
       email,
