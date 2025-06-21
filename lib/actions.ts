@@ -36,132 +36,63 @@ export const uploadImage = async (imagePath: string) => {
   }
 };
 
-export const fetchAllProjects = async (category?: string | null, endcursor?: string | null) => {
-  try {
-    // Convert endcursor to page number for our database function
-    const page = endcursor ? parseInt(endcursor) || 1 : 1;
-    const result = await getProjectsDB(category, page);
-    return {
-      projectSearch: {
-        edges: result.projects.map((project: any) => ({ node: project })),
-        pageInfo: {
-          ...result.pageInfo,
-          startCursor: page.toString(),
-          endCursor: (page + 1).toString()
-        }
-      }
-    };
-  } catch (err) {
-    throw err;
-  }
-};
-
 export const createNewProject = async (form: ProjectForm, creatorId: string, token: string) => {
-  try {
-    const imageUrl = await uploadImage(form.image);
+  const imageUrl = await uploadImage(form.image);
 
-    if (imageUrl.url) {
-      const project = await createProjectDB({
-        ...form,
-        image: imageUrl.url
-      }, creatorId);
+  if (imageUrl.url) {
+    const newProject = {
+      ...form, 
+      image: imageUrl.url, 
+      createdBy: {
+        link: creatorId
+      }
+    };
 
-      return {
-        projectCreate: {
-          project
-        }
-      };
-    }
-  } catch (err) {
-    throw err;
+    return createProjectDB(newProject);
   }
 };
 
-export const updateProject = async (form: ProjectForm, projectId: string, token: string) => {
-  try {
-    function isBase64DataURL(value: string) {
-      const base64Regex = /^data:image\/[a-z]+;base64,/;
-      return base64Regex.test(value);
-    }
-
-    let updatedForm = { ...form };
-
-    const isUploadingNewImage = isBase64DataURL(form.image);
-
-    if (isUploadingNewImage) {
-      const imageUrl = await uploadImage(form.image);
-
-      if (imageUrl.url) {
-        updatedForm = { ...updatedForm, image: imageUrl.url };
-      }
-    }
-
-    const project = await updateProjectDB(projectId, updatedForm);
-
-    return {
-      projectUpdate: {
-        project
-      }
-    };
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const deleteProject = async (id: string, token: string) => {
-  try {
-    const result = await deleteProjectDB(id);
-    return {
-      projectDelete: result
-    };
-  } catch (err) {
-    throw err;
-  }
+export const fetchAllProjects = async (category?: string | null, endcursor?: string | null) => {
+  return getProjectsDB(category, endcursor, 8);
 };
 
 export const getProjectDetails = async (id: string) => {
-  try {
-    const project = await getProjectByIdDB(id);
-    return { project };
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const createUser = async (name: string, email: string, avatarUrl: string) => {
-  try {
-    const user = await createUserDB(name, email, avatarUrl);
-    return {
-      userCreate: {
-        user
-      }
-    };
-  } catch (err) {
-    throw err;
-  }
+  return getProjectByIdDB(id);
 };
 
 export const getUserProjects = async (id: string, last?: number) => {
-  try {
-    const user = await getUserProjectsDB(id, last);
-    return {
-      user: {
-        ...user?.toObject(),
-        projects: {
-          edges: user?.projects?.map((project: any) => ({ node: project })) || []
-        }
-      }
-    };
-  } catch (err) {
-    throw err;
+  return getUserProjectsDB(id, last);
+};
+
+export const deleteProject = async (id: string, token: string) => {
+  return deleteProjectDB(id);
+};
+
+export const updateProject = async (form: ProjectForm, projectId: string, token: string) => {
+  function isBase64DataURL(value: string) {
+    const base64Regex = /^data:image\/[a-z]+;base64,/;
+    return base64Regex.test(value);
   }
+
+  let updatedForm = { ...form };
+
+  const isUploadingNewImage = isBase64DataURL(form.image);
+
+  if (isUploadingNewImage) {
+    const imageUrl = await uploadImage(form.image);
+
+    if (imageUrl.url) {
+      updatedForm = { ...updatedForm, image: imageUrl.url };
+    }
+  }
+
+  return updateProjectDB(updatedForm, projectId);
+};
+
+export const createUser = async (name: string, email: string, avatarUrl: string) => {
+  return createUserDB({ name, email, avatarUrl });
 };
 
 export const getUser = async (email: string) => {
-  try {
-    const user = await getUserDB(email);
-    return { user };
-  } catch (err) {
-    throw err;
-  }
+  return getUserDB(email);
 };

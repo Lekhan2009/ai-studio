@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -14,7 +15,7 @@ const LoadMore = ({ startCursor, endCursor, hasPreviousPage, hasNextPage }: Prop
 
     const handleNavigation = (type: string) => {
         const currentParams = new URLSearchParams(window.location.search);
-
+        
         if (type === "prev" && hasPreviousPage) {
             currentParams.delete("endcursor");
             currentParams.set("startcursor", startCursor);
@@ -22,23 +23,23 @@ const LoadMore = ({ startCursor, endCursor, hasPreviousPage, hasNextPage }: Prop
             currentParams.delete("startcursor");
             currentParams.set("endcursor", endCursor);
         }
-
+        
         const newSearchParams = currentParams.toString();
         const newPathname = `${window.location.pathname}?${newSearchParams}`;
-
+        
         router.push(newPathname);
     };
 
     return (
         <div className="w-full flexCenter gap-5 mt-10">
             {hasPreviousPage && (
-                <button className="flexCenter gap-1 px-4 py-3 rounded-lg text-sm font-medium bg-light-white-300 text-gray-100 hover:bg-white" onClick={() => handleNavigation("prev")}>
-                    <span>Previous</span>
+                <button className="flexCenter gap-2 px-4 py-3 bg-light-white-200 rounded-md text-gray-100 text-sm font-medium" onClick={() => handleNavigation("prev")}>
+                    First
                 </button>
             )}
             {hasNextPage && (
-                <button className="flexCenter gap-1 px-4 py-3 rounded-lg text-sm font-medium bg-light-white-300 text-gray-100 hover:bg-white" onClick={() => handleNavigation("next")}>
-                    <span>Next</span>
+                <button className="flexCenter gap-2 px-4 py-3 bg-light-white-200 rounded-md text-gray-100 text-sm font-medium" onClick={() => handleNavigation("next")}>
+                    Next
                 </button>
             )}
         </div>

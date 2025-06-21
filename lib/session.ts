@@ -17,19 +17,19 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/api/auth/signin',
+    signIn: "/",
   },
   jwt: {
     encode: ({ secret, token }) => {
       const encodedToken = jsonwebtoken.sign(
         {
           ...token,
-          iss: process.env.NEXTAUTH_URL,
+          iss: "grafbase",
           exp: Math.floor(Date.now() / 1000) + 60 * 60,
         },
         secret
       );
-
+      
       return encodedToken;
     },
     decode: async ({ secret, token }) => {
@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
     }) {
       try {
         const userExists = await getUser(user?.email as string) as { user?: UserProfile }
-
+        
         if (!userExists.user) {
           await createUser(user.name as string, user.email as string, user.image as string);
         }
@@ -78,7 +78,7 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
     },
-  }
+  },
 };
 
 export async function getCurrentUser() {
