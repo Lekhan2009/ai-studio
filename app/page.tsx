@@ -30,7 +30,7 @@ export const dynamicParams = true;
 export const revalidate = 0;
 
 const Home = async ({ searchParams: { category, endcursor } }: Props) => {
-  const data = await fetchAllProjects(category, endcursor) as ProjectSearch
+  const data = await fetchAllProjects(category, endcursor) as ProjectSearch;
 
   const projectsToDisplay = data?.projectSearch?.edges || [];
 
@@ -38,8 +38,18 @@ const Home = async ({ searchParams: { category, endcursor } }: Props) => {
     return (
       <section className="flexStart flex-col paddings">
         <Categories />
-
-        <p className="no-result-text text-center">No projects found, go create some first.</p>
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-bold mb-4">No projects found</h2>
+          <p className="text-gray-600 mb-6">
+            {category 
+              ? `No projects found in the "${category}" category.` 
+              : "No projects available yet."
+            }
+          </p>
+          <p className="text-gray-500">
+            Be the first to share your amazing project with the community!
+          </p>
+        </div>
       </section>
     )
   }

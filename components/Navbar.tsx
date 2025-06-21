@@ -17,9 +17,11 @@ const Navbar = async () => {
         <Link href='/'>
           <Image
             src='/logo.svg'
-            width={116}
-            height={43}
+            width={104}
+            height={38}
             alt='logo'
+            priority
+            style={{ width: 'auto', height: 'auto' }}
           />
         </Link>
         <ul className='xl:flex hidden text-small gap-7'>

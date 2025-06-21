@@ -48,6 +48,7 @@ const ProjectCard = ({ id, image, title, name, avatarUrl, userId }: Props) => {
                                 height={24}
                                 className="rounded-full"
                                 alt="profile image"
+                                style={{ width: '24px', height: '24px' }}
                             />
                             <p>{name}</p>
                         </div>               
@@ -55,11 +56,11 @@ const ProjectCard = ({ id, image, title, name, avatarUrl, userId }: Props) => {
 
                 <div className="flexCenter gap-3">
                     <div className="flexCenter gap-2">
-                        <Image src="/hearth.svg" width={13} height={12} alt="heart" />
+                        <Image src="/hearth.svg" width={13} height={12} alt="heart" style={{ width: '13px', height: '12px' }} />
                         <p className="text-sm">{randomLikes}</p>
                     </div>
                     <div className="flexCenter gap-2">
-                        <Image src="/eye.svg" width={12} height={9} alt="eye" />
+                        <Image src="/eye.svg" width={12} height={9} alt="eye" style={{ width: '12px', height: '9px' }} />
                         <p className="text-sm">{randomViews}</p>
                     </div>
                 </div>

@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
         },
         secret
       );
-      
+
       return encodedToken;
     },
     decode: async ({ secret, token }) => {
@@ -62,14 +62,21 @@ export const authOptions: NextAuthOptions = {
         return session;
       }
     },
-    async signIn({ user }: {
-      user: AdapterUser | User
-    }) {
+    async signIn({ user }) {
       try {
-        const userExists = await getUser(user?.email as string) as { user?: UserProfile }
-        
+        if (!user?.email) {
+          console.error("No email provided for user sign in");
+          return false;
+        }
+
+        const userExists = await getUser(user.email as string) as { user?: UserProfile }
+
         if (!userExists.user) {
-          await createUser(user.name as string, user.email as string, user.image as string)
+          await createUser(
+            user.name as string || 'Anonymous User', 
+            user.email as string, 
+            user.image as string || ''
+          );
         }
 
         return true;
