@@ -20,9 +20,7 @@ export async function connectMongoose() {
     });
     console.log('✅ Connected to MongoDB with Mongoose');
   } catch (error) {
-    console.error('❌ Error connecting to MongoDB:', error);
+    console.error('❌ MongoDB connection error:', error);
     throw error;
   }
 }
-
-export default mongoose;

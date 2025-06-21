@@ -25,29 +25,24 @@ export const categoryFilters = [
 
 export const footerLinks = [
   {
-    title: 'For developers',
+    title: 'For designers',
     links: [
       'Go Pro!',
-      'Explore development work',
-      'Development blog',
-      'Code podcast',
-      'Open-source projects',
+      'Explore design work',
+      'Design blog',
+      'Overtime podcast',
+      'Playoffs',
+      'Weekly Warm-Up',
       'Refer a Friend',
       'Code of conduct',
     ],
   },
   {
-    title: 'Hire developers',
+    title: 'Hire designers',
     links: [
       'Post a job opening',
       'Post a freelance project',
-      'Search for developers',
-    ],
-  },
-  {
-    title: 'Brands',
-    links: [
-      'Advertise with us',
+      'Search for designers',
     ],
   },
   {
@@ -67,31 +62,31 @@ export const footerLinks = [
   {
     title: 'Directories',
     links: [
-      'Development jobs',
-      'Developers for hire',
-      'Freelance developers for hire',
+      'Design jobs',
+      'Designers for hire',
+      'Freelance designers for hire',
       'Tags',
       'Places',
     ],
   },
   {
-    title: 'Development assets',
+    title: 'Design assets',
     links: [
-      'Code Marketplace',
-      'GitHub Marketplace',
-      'NPM Registry',
-      'Packagephobia',
+      'Shop',
+      'Creative Market',
+      'Fontspring',
+      'Font Squirrel',
     ],
   },
   {
-    title: 'Development Resources',
+    title: 'Design Resources',
     links: [
       'Freelancing',
-      'Development Hiring',
-      'Development Portfolio',
-      'Development Education',
+      'Design Hiring',
+      'Design Portfolio',
+      'Design Education',
       'Creative Process',
-      'Development Industry Trends',
+      'Design Industry Trends',
     ],
   },
 ];

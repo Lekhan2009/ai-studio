@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -15,7 +14,7 @@ const LoadMore = ({ startCursor, endCursor, hasPreviousPage, hasNextPage }: Prop
 
     const handleNavigation = (type: string) => {
         const currentParams = new URLSearchParams(window.location.search);
-        
+
         if (type === "prev" && hasPreviousPage) {
             currentParams.delete("endcursor");
             currentParams.set("startcursor", startCursor);
