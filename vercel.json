@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "functions": {
     "app/api/**/*.ts": {
-      "runtime": "nodejs18.x"  // Specify a valid Node.js version
+      "runtime": "nodejs18.x"
     }
   }
 }
