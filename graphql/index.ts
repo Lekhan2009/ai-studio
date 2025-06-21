@@ -64,30 +64,36 @@ export const createUser = async (name: string, email: string, avatarUrl: string)
 };
 
 export const getProjects = async (category?: string | null, page: number = 1, limit: number = 8) => {
-  await connectMongoose();
-  
-  const skip = (page - 1) * limit;
-  const filter = category ? { category } : {};
-  
-  const projects = await Project.find(filter)
-    .populate('createdBy', 'id name email avatarUrl')
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-  
-  const total = await Project.countDocuments(filter);
-  const hasNextPage = skip + limit < total;
-  const hasPreviousPage = page > 1;
-  
-  return {
-    projects,
-    pageInfo: {
-      hasNextPage,
-      hasPreviousPage,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit)
-    }
-  };
+  try {
+    await connectMongoose();
+    
+    const skip = (page - 1) * limit;
+    const filter = category ? { category } : {};
+    
+    const projects = await Project.find(filter)
+      .populate('createdBy', 'id name email avatarUrl')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .maxTimeMS(30000); // 30 seconds timeout for this operation
+    
+    const total = await Project.countDocuments(filter);
+    const hasNextPage = skip + limit < total;
+    const hasPreviousPage = page > 1;
+    
+    return {
+      projects,
+      pageInfo: {
+        hasNextPage,
+        hasPreviousPage,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    throw new Error('Failed to fetch projects. Please check your database connection.');
+  }
 };
 
 export const getProjectById = async (id: string) => {

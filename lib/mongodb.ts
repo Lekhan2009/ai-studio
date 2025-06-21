@@ -28,9 +28,17 @@ export async function connectMongoose() {
   }
   
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 20000, // 20 seconds
+      socketTimeoutMS: 45000, // 45 seconds
+      bufferMaxEntries: 0,
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      family: 4 // Use IPv4, skip trying IPv6
+    });
     console.log('Connected to MongoDB with Mongoose');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
+    throw error;
   }
 }
