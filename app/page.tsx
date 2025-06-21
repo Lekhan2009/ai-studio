@@ -47,15 +47,15 @@ const Home = async ({ searchParams: { category, endCursor } }: Props) => {
     <section className="flexStart flex-col paddings mb-16">
       <Categories />
       <section className="projects-grid">
-        {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (
+        {projectsToDisplay.map((project: ProjectInterface) => (
           <ProjectCard
-            key={`${node?.id}`}
-            id={node?.id}
-            image={node?.image}
-            title={node?.title}
-            name={node?.createdBy.name}
-            avatarUrl={node?.createdBy.avatarUrl}
-            userId={node?.createdBy.id}
+            key={`${project?.id}`}
+            id={project?.id}
+            image={project?.image}
+            title={project?.title}
+            name={project?.createdBy.name}
+            avatarUrl={project?.createdBy.avatarUrl}
+            userId={project?.createdBy.id}
           />
         ))}
       </section>
