@@ -5,7 +5,7 @@ run = "npm run dev"
 channel = "stable-24_05"
 
 [deployment]
-run = ["sh", "-c", "npm run start"]
+run = ["sh", "-c", "npm start"]
 build = ["sh", "-c", "npm run build"]
 
 [[ports]]
@@ -17,13 +17,12 @@ localPort = 34605
 externalPort = 3001
 
 [[ports]]
-localPort = 40931
-externalPort = 3003
-exposeLocalhost = true
-
-[[ports]]
 localPort = 42999
 externalPort = 3000
+
+[[ports]]
+localPort = 44545
+externalPort = 3003
 
 [[ports]]
 localPort = 46651
