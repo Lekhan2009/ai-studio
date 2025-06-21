@@ -37,13 +37,19 @@ export const uploadImage = async (imagePath: string) => {
   }
 };
 
-export const fetchAllProjects = async (category?: string | null, page?: number) => {
+export const fetchAllProjects = async (category?: string | null, endcursor?: string | null) => {
   try {
+    // Convert endcursor to page number for our database function
+    const page = endcursor ? parseInt(endcursor) || 1 : 1;
     const result = await getProjectsDB(category, page);
     return {
       projectSearch: {
         edges: result.projects.map((project: any) => ({ node: project })),
-        pageInfo: result.pageInfo
+        pageInfo: {
+          ...result.pageInfo,
+          startCursor: page.toString(),
+          endCursor: (page + 1).toString()
+        }
       }
     };
   } catch (err) {

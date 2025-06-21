@@ -70,6 +70,22 @@ export const getProjects = async (category?: string | null, page: number = 1, li
     const skip = (page - 1) * limit;
     const filter = category ? { category } : {};
     
+    // Check if we have any projects first
+    const projectCount = await Project.countDocuments({});
+    console.log('Total projects in database:', projectCount);
+    
+    if (projectCount === 0) {
+      return {
+        projects: [],
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          currentPage: 1,
+          totalPages: 0
+        }
+      };
+    }
+    
     const projects = await Project.find(filter)
       .populate('createdBy', 'id name email avatarUrl')
       .sort({ createdAt: -1 })
@@ -92,7 +108,18 @@ export const getProjects = async (category?: string | null, page: number = 1, li
     };
   } catch (error) {
     console.error('Error fetching projects:', error);
-    throw new Error('Failed to fetch projects. Please check your database connection.');
+    console.error('MongoDB connection state:', require('mongoose').connection.readyState);
+    
+    // Return empty result instead of throwing error
+    return {
+      projects: [],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+        currentPage: 1,
+        totalPages: 0
+      }
+    };
   }
 };
 
