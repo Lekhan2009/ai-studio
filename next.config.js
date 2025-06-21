@@ -4,7 +4,8 @@ const nextConfig = {
     domains: ['lh3.googleusercontent.com', 'res.cloudinary.com', 'images.unsplash.com']
   },
   experimental: {
-    serverComponentsExternalPackages: ['mongoose']
+    serverComponentsExternalPackages: ['mongoose'],
+    esmExternals: 'loose'
   },
   env: {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,

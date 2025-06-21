@@ -129,3 +129,12 @@ export interface ProjectForm {
   githubUrl: string;
   category: string;
 }
+export interface ProjectSearch {
+  projects: ProjectInterface[];
+  pageInfo: {
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+    startCursor: string;
+    endCursor: string | null;
+  };
+}

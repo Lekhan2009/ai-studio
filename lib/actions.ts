@@ -263,3 +263,25 @@ export const uploadImage = async (imagePath: string) => {
     throw err;
   }
 };
+
+export async function createProject(form: ProjectForm) {
+  const imageUrl = await uploadImage(form.image);
+
+  if (imageUrl.url) {
+    try {
+      await connectToDB();
+
+      const newProject = await Project.create({
+        ...form,
+        image: imageUrl.url,
+        createdBy: form.createdBy,
+      });
+
+      return newProject;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+export const createNewProject = createProject;
