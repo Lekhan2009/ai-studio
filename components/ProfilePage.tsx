@@ -16,7 +16,7 @@ const ProfilePage = ({ user }: Props) => (
                 <Image src={user?.avatarUrl} width={100} height={100} className="rounded-full" alt="user image" />
                 <p className="text-4xl font-bold mt-10">{user?.name}</p>
                 <p className="md:text-5xl text-3xl font-extrabold md:mt-10 mt-5 max-w-lg">I’m Software Engineer at JSM 👋</p>
-                
+
                 <div className="flex mt-8 gap-5 w-full flex-wrap">
                     <Button 
                         title="Follow" 
@@ -51,18 +51,22 @@ const ProfilePage = ({ user }: Props) => (
 
        <section className="flexStart flex-col lg:mt-28 mt-16 w-full">
            <p className="w-full text-left text-lg font-semibold">Recent Work</p>
-           
+
            <div className="profile_projects">
                 {user?.projects?.edges?.map(
                     ({ node }: { node: ProjectInterface }) => (
                         <ProjectCard
                             key={`${node?.id}`}
-                            id={node?.id}
-                            image={node?.image}
-                            title={node?.title}
-                            name={user.name}
-                            avatarUrl={user.avatarUrl}
-                            userId={user.id}
+                            project={{
+                                ...node,
+                                createdBy: {
+                                    name: user.name,
+                                    email: user.email,
+                                    avatarUrl: user.avatarUrl,
+                                    _id: user._id,
+                                    id: user.id
+                                }
+                            }}
                         />
                     )
                 )}
