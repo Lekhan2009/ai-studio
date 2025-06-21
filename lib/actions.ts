@@ -269,7 +269,7 @@ export async function createProject(form: ProjectForm) {
 
   if (imageUrl.url) {
     try {
-      await connectToDB();
+      await connectMongoose();
 
       const newProject = await Project.create({
         ...form,
