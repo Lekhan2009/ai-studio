@@ -32,7 +32,7 @@ export const revalidate = 0;
 const Home = async ({ searchParams: { category, endCursor } }: Props) => {
   const data = await getProjects(category, endCursor);
 
-  const projectsToDisplay = data?.projects || [];
+  const projectsToDisplay = data?.projectSearch?.edges?.map((edge: any) => edge.node) || [];
 
   if (projectsToDisplay.length === 0) {
     return (
@@ -59,12 +59,12 @@ const Home = async ({ searchParams: { category, endCursor } }: Props) => {
           />
         ))}
       </section>
-      {data?.pageInfo?.hasNextPage && (
+      {data?.projectSearch?.pageInfo?.hasNextPage && (
         <LoadMore 
-          startCursor={data?.pageInfo?.startCursor} 
-          endCursor={data?.pageInfo?.endCursor}
-          hasPreviousPage={data?.pageInfo?.hasPreviousPage} 
-          hasNextPage={data?.pageInfo?.hasNextPage}
+          startCursor={data?.projectSearch?.pageInfo?.startCursor} 
+          endCursor={data?.projectSearch?.pageInfo?.endCursor}
+          hasPreviousPage={data?.projectSearch?.pageInfo?.hasPreviousPage} 
+          hasNextPage={data?.projectSearch?.pageInfo?.hasNextPage}
         />
       )}
     </section>

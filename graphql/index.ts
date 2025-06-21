@@ -1,57 +1,10 @@
 import { connectMongoose } from "@/lib/mongodb";
 import Project from "@/models/Project";
 import User from "@/models/User";
+import { fetchAllProjects } from "@/lib/actions";
 
-export const getProjects = async (category?: string, endCursor?: string) => {
-  try {
-    await connectMongoose();
-
-    let query = {};
-    if (category && category !== 'All') {
-      query = { category };
-    }
-
-    const limit = 8;
-    let projectQuery = Project.find(query).populate('createdBy').sort({ createdAt: -1 });
-
-    if (endCursor) {
-      projectQuery = projectQuery.skip(parseInt(endCursor));
-    }
-
-    const projects = await projectQuery.limit(limit);
-    const totalProjects = await Project.countDocuments(query);
-
-    const hasNextPage = parseInt(endCursor || '0') + limit < totalProjects;
-    const hasPreviousPage = parseInt(endCursor || '0') > 0;
-
-    return {
-      projects: projects.map(project => ({
-        ...project.toObject(),
-        id: project._id.toString(),
-        createdBy: {
-          ...project.createdBy.toObject(),
-          id: project.createdBy._id.toString()
-        }
-      })),
-      pageInfo: {
-        hasNextPage,
-        hasPreviousPage,
-        startCursor: endCursor || '0',
-        endCursor: hasNextPage ? (parseInt(endCursor || '0') + limit).toString() : null
-      }
-    };
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    return {
-      projects: [],
-      pageInfo: {
-        hasNextPage: false,
-        hasPreviousPage: false,
-        startCursor: '0',
-        endCursor: null
-      }
-    };
-  }
+export const getProjects = async (category?: string | null, endCursor?: string | null) => {
+  return await fetchAllProjects(category, endCursor);
 };
 
 export const getProjectById = async (id: string) => {
