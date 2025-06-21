@@ -12,18 +12,13 @@ localPort = 3000
 externalPort = 80
 
 [[ports]]
-localPort = 35625
-externalPort = 3002
-exposeLocalhost = true
-
-[[ports]]
-localPort = 42449
-externalPort = 3000
-
-[[ports]]
-localPort = 44619
+localPort = 43537
 externalPort = 3001
 exposeLocalhost = true
+
+[[ports]]
+localPort = 44421
+externalPort = 3000
 
 [workflows]
 runButton = "Run"
