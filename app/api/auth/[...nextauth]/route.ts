@@ -2,13 +2,12 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { connectMongoose } from "@/lib/mongodb";
 import User from "@/models/User";
-import type { NextAuthOptions } from "next-auth";
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
   theme: {
@@ -18,25 +17,27 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session }) {
       try {
-        await connectMongoose();
+        await connectMongoose(); // Ensure database connection
         const sessionUser = await User.findOne({ email: session.user?.email });
-
-        if (sessionUser && session.user) {
-          session.user.id = sessionUser._id.toString();
+        
+        if (sessionUser) {
+          session.user = {
+            ...session.user,
+            id: sessionUser._id.toString(), // Add user ID to session
+          };
         }
       } catch (error) {
         console.error("Session callback error:", error);
       }
-
+      
       return session;
     },
-
     async signIn({ user }) {
       try {
-        await connectMongoose();
-
+        await connectMongoose(); // Ensure database connection
+        
         const userExists = await User.findOne({ email: user.email });
-
+        
         if (!userExists) {
           await User.create({
             email: user.email,
@@ -44,19 +45,19 @@ export const authOptions: NextAuthOptions = {
             avatarUrl: user.image,
           });
         }
-
-        return true;
+        
+        return true; // Allow sign-in
       } catch (error) {
         console.error("SignIn callback error:", error);
-        return false;
+        return false; // Prevent sign-in
       }
     },
   },
   pages: {
-    signIn: "/",
+    signIn: "/", // Custom sign-in page
   },
-  secret: process.env.NEXTAUTH_SECRET!,
-};
+  secret: process.env.NEXTAUTH_SECRET, // JWT secret
+});
 
-const handler = NextAuth(authOptions);
+// Export GET and POST handlers
 export { handler as GET, handler as POST };
