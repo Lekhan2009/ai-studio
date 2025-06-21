@@ -50,12 +50,7 @@ const Home = async ({ searchParams: { category, endCursor } }: Props) => {
         {projectsToDisplay.map((project: ProjectInterface) => (
           <ProjectCard
             key={`${project?.id}`}
-            id={project?.id}
-            image={project?.image}
-            title={project?.title}
-            name={project?.createdBy.name}
-            avatarUrl={project?.createdBy.avatarUrl}
-            userId={project?.createdBy.id}
+            project={project}
           />
         ))}
       </section>
