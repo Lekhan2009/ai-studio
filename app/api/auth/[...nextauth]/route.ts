@@ -12,7 +12,7 @@ const handler = NextAuth({
   ],
   theme: {
     colorScheme: "light",
-    logo: "/logo.svg",
+    logo: "/logo.svg", // optional logo
   },
   callbacks: {
     async session({ session }) {
@@ -32,28 +32,31 @@ const handler = NextAuth({
 
       return session;
     },
+
     async signIn({ user }) {
       try {
         await connectMongoose();
-        const userExists = await User.findOne({ email: user.email });
 
-        if (!userExists) {
+        const existingUser = await User.findOne({ email: user.email });
+
+        if (!existingUser) {
           await User.create({
             email: user.email,
             name: user.name,
             avatarUrl: user.image,
+            projects: [],
           });
         }
 
         return true;
       } catch (error) {
-        console.error("SignIn callback error:", error);
+        console.error("SignIn error:", error);
         return false;
       }
     },
   },
   pages: {
-    signIn: "/",
+    signIn: "/", // optional custom sign-in page
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
