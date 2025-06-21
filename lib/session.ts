@@ -1,88 +1,62 @@
-
 import { getServerSession } from "next-auth/next";
 import { NextAuthOptions, User } from "next-auth";
-import { AdapterUser } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
-import jsonwebtoken from 'jsonwebtoken'
-import { JWT } from "next-auth/jwt";
-
-import { createUser, getUser } from "./actions";
-import { SessionInterface, UserProfile } from "@/common.types";
+import { connectMongoose } from "./mongodb";
+import UserModel from "@/models/User";
+import { SessionInterface } from "@/common.types";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
-  pages: {
-    signIn: "/",
-  },
-  jwt: {
-    encode: ({ secret, token }) => {
-      const encodedToken = jsonwebtoken.sign(
-        {
-          ...token,
-          iss: "grafbase",
-          exp: Math.floor(Date.now() / 1000) + 60 * 60,
-        },
-        secret
-      );
-      
-      return encodedToken;
-    },
-    decode: async ({ secret, token }) => {
-      const decodedToken = jsonwebtoken.verify(token!, secret);
-      return decodedToken as JWT;
-    },
-  },
-  theme: {
-    colorScheme: "light",
-    logo: "/logo.svg",
-  },
   callbacks: {
     async session({ session }) {
-      const email = session?.user?.email as string;
-
       try {
-        const data = await getUser(email) as { user?: UserProfile }
+        await connectMongoose();
+        const sessionUser = await UserModel.findOne({ email: session.user?.email });
 
-        const newSession = {
-          ...session,
-          user: {
+        if (sessionUser) {
+          session.user = {
             ...session.user,
-            ...data?.user,
-          },
-        };
-
-        return newSession;
-      } catch (error: any) {
-        console.error("Error retrieving user data: ", error.message);
-        return session;
+            id: sessionUser._id.toString(),
+            avatarUrl: sessionUser.avatarUrl,
+          };
+        }
+      } catch (error) {
+        console.error("Session callback error:", error);
       }
+
+      return session;
     },
-    async signIn({ user }: {
-      user: AdapterUser | User
-    }) {
+
+    async signIn({ user }: { user: User }) {
       try {
-        const userExists = await getUser(user?.email as string) as { user?: UserProfile }
-        
-        if (!userExists.user) {
-          await createUser(user.name as string, user.email as string, user.image as string);
+        await connectMongoose();
+
+        const existingUser = await UserModel.findOne({ email: user.email });
+
+        if (!existingUser) {
+          await UserModel.create({
+            email: user.email,
+            name: user.name,
+            avatarUrl: user.image,
+          });
         }
 
         return true;
-      } catch (error: any) {
-        console.log("Error checking if user exists: ", error.message);
+      } catch (error) {
+        console.error("SignIn error:", error);
         return false;
       }
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 export async function getCurrentUser() {
   const session = await getServerSession(authOptions) as SessionInterface;
-
   return session;
 }

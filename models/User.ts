@@ -1,54 +1,36 @@
-import mongoose, { Schema, Document } from "mongoose";
+import { Schema, model, models } from 'mongoose';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  avatarUrl: string;
-  description?: string;
-  githubUrl?: string;
-  linkedinUrl?: string;
-  projects: mongoose.Types.ObjectId[];
-}
-
-const UserSchema: Schema = new Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      minlength: 2,
-      maxlength: 100,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    avatarUrl: {
-      type: String,
-      required: true,
-    },
-    description: {
-      type: String,
-      maxlength: 500,
-    },
-    githubUrl: {
-      type: String,
-    },
-    linkedinUrl: {
-      type: String,
-    },
-    projects: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Project",
-      },
-    ],
+const UserSchema = new Schema({
+  email: {
+    type: String,
+    unique: true,
+    required: true,
   },
-  {
-    timestamps: true,
-  }
-);
+  name: {
+    type: String,
+    required: true,
+  },
+  avatarUrl: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  githubUrl: {
+    type: String,
+  },
+  linkedinUrl: {
+    type: String,
+  },
+  projects: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Project',
+  }],
+}, {
+  timestamps: true,
+});
 
-const User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+const User = models.User || model('User', UserSchema);
 
 export default User;

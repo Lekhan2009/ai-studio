@@ -1,17 +1,17 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["mongoose", "mongodb"]
   },
   images: {
-    domains: ['lh3.googleusercontent.com']
+    domains: ['lh3.googleusercontent.com', 'res.cloudinary.com']
   },
   webpack(config) {
     config.experiments = {
       ...config.experiments,
       topLevelAwait: true,
     }
-    // Exclude server-side modules from client bundle
     config.resolve.fallback = {
       ...config.resolve.fallback,
       "fs": false,
