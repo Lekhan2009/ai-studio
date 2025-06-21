@@ -16,17 +16,20 @@ export interface ProjectInterface {
     liveSiteUrl: string;
     githubUrl: string;
     category: string;
-    id: string;
+    _id: string;
+    id?: string;
     createdBy: {
       name: string;
       email: string;
       avatarUrl: string;
-      id: string;
+      _id: string;
+      id?: string;
     };
 }
 
 export interface UserProfile {
-    id: string;
+    _id: string;
+    id?: string;
     name: string;
     email: string;
     description: string | null;

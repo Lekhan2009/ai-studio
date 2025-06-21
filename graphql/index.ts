@@ -1,142 +1,130 @@
-export const createProjectMutation = `
-	mutation CreateProject($input: ProjectCreateInput!) {
-		projectCreate(input: $input) {
-			project {
-				id
-				title
-				description
-				createdBy {
-					email
-					name
-				}
-			}
-		}
-	}
-`;
 
-export const updateProjectMutation = `
-	mutation UpdateProject($id: ID!, $input: ProjectUpdateInput!) {
-		projectUpdate(by: { id: $id }, input: $input) {
-			project {
-				id
-				title
-				description
-				createdBy {
-					email
-					name
-				}
-			}
-		}
-	}
-`;
+import { connectMongoose } from '@/lib/mongodb';
+import User, { IUser } from '@/models/User';
+import Project, { IProject } from '@/models/Project';
+import { ProjectForm } from '@/common.types';
 
-export const deleteProjectMutation = `
-  mutation DeleteProject($id: ID!) {
-    projectDelete(by: { id: $id }) {
-      deletedId
-    }
-  }
-`;
-      
-export const createUserMutation = `
-	mutation CreateUser($input: UserCreateInput!) {
-		userCreate(input: $input) {
-			user {
-				name
-				email
-				avatarUrl
-				description
-				githubUrl
-				linkedinUrl
-				id
-			}
-		}
-	}
-`;
+export const createProject = async (projectData: ProjectForm, userId: string) => {
+  await connectMongoose();
+  
+  const newProject = new Project({
+    ...projectData,
+    createdBy: userId
+  });
+  
+  const savedProject = await newProject.save();
+  await savedProject.populate('createdBy', 'name email avatarUrl');
+  
+  // Add project to user's projects array
+  await User.findByIdAndUpdate(userId, {
+    $push: { projects: savedProject._id }
+  });
+  
+  return savedProject;
+};
 
-export const projectsQuery = `
-  query getProjects($category: String, $endcursor: String) {
-    projectSearch(first: 8, after: $endcursor, filter: {category: {eq: $category}}) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      edges {
-        node {
-          title
-          githubUrl
-          description
-          liveSiteUrl
-          id
-          image
-          category
-          createdBy {
-            id
-            email
-            name
-            avatarUrl
-          }
-        }
-      }
-    }
-  }
-`;
+export const updateProject = async (projectId: string, projectData: Partial<ProjectForm>) => {
+  await connectMongoose();
+  
+  const updatedProject = await Project.findByIdAndUpdate(
+    projectId,
+    projectData,
+    { new: true }
+  ).populate('createdBy', 'name email avatarUrl');
+  
+  return updatedProject;
+};
 
-export const getProjectByIdQuery = `
-  query GetProjectById($id: ID!) {
-    project(by: { id: $id }) {
-      id
-      title
-      description
-      image
-      liveSiteUrl
-      githubUrl
-      category
-      createdBy {
-        id
-        name
-        email
-        avatarUrl
-      }
-    }
-  }
-`;
+export const deleteProject = async (projectId: string) => {
+  await connectMongoose();
+  
+  const project = await Project.findById(projectId);
+  if (!project) throw new Error('Project not found');
+  
+  // Remove project from user's projects array
+  await User.findByIdAndUpdate(project.createdBy, {
+    $pull: { projects: projectId }
+  });
+  
+  await Project.findByIdAndDelete(projectId);
+  return { deletedId: projectId };
+};
 
-export const getUserQuery = `
-  query GetUser($email: String!) {
-    user(by: { email: $email }) {
-      id
-      name
-      email
-      avatarUrl
-      description
-      githubUrl
-      linkedinUrl
+export const createUser = async (name: string, email: string, avatarUrl: string) => {
+  await connectMongoose();
+  
+  const newUser = new User({
+    name,
+    email,
+    avatarUrl
+  });
+  
+  const savedUser = await newUser.save();
+  return savedUser;
+};
+
+export const getProjects = async (category?: string | null, page: number = 1, limit: number = 8) => {
+  await connectMongoose();
+  
+  const skip = (page - 1) * limit;
+  const filter = category ? { category } : {};
+  
+  const projects = await Project.find(filter)
+    .populate('createdBy', 'id name email avatarUrl')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+  
+  const total = await Project.countDocuments(filter);
+  const hasNextPage = skip + limit < total;
+  const hasPreviousPage = page > 1;
+  
+  return {
+    projects,
+    pageInfo: {
+      hasNextPage,
+      hasPreviousPage,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit)
     }
-  }
-`;
-      
-export const getProjectsOfUserQuery = `
-  query getUserProjects($id: ID!, $last: Int = 4) {
-    user(by: { id: $id }) {
-      id
-      name
-      email
-      description
-      avatarUrl
-      githubUrl
-      linkedinUrl
-      projects(last: $last) {
-        edges {
-          node {
-            id
-            title
-            image
-          }
-        }
-      }
-    }
-  }
-`;
+  };
+};
+
+export const getProjectById = async (id: string) => {
+  await connectMongoose();
+  
+  const project = await Project.findById(id)
+    .populate('createdBy', 'id name email avatarUrl');
+  
+  return project;
+};
+
+export const getUser = async (email: string) => {
+  await connectMongoose();
+  
+  const user = await User.findOne({ email });
+  return user;
+};
+
+export const getUserById = async (id: string) => {
+  await connectMongoose();
+  
+  const user = await User.findById(id);
+  return user;
+};
+
+export const getUserProjects = async (userId: string, limit: number = 4) => {
+  await connectMongoose();
+  
+  const user = await User.findById(userId)
+    .populate({
+      path: 'projects',
+      options: { 
+        sort: { createdAt: -1 },
+        limit: limit
+      },
+      select: 'id title image'
+    });
+  
+  return user;
+};

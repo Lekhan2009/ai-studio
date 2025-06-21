@@ -121,8 +121,7 @@ NEXTAUTH_SECRET=
 CLOUDINARY_NAME=
 CLOUDINARY_KEY=
 CLOUDINARY_SECRET=
-GRAFBASE_API_URL=
-GRAFBASE_API_KEY=
+MONGODB_URI=mongodb://localhost:27017/flexibble
 ```
 
 Replace the placeholder values with your actual credentials. You can obtain these credentials by signing up on the corresponding websites from [Google Cloud](https://console.cloud.google.com), [Cloudinary](https://cloudinary.com/), and [Grafbase](https://grafbase.com/).
