@@ -15,6 +15,10 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  pages: {
+    signIn: '/api/auth/signin',
+    error: '/api/auth/error',
+  },
   jwt: {
     encode: ({ secret, token }) => {
       const encodedToken = jsonwebtoken.sign(
