@@ -1,3 +1,4 @@
+
 export const NavLinks = [
   { href: '/', key: 'Inspiration', text: 'Inspiration' },
   { href: '/', key: 'Find Projects', text: 'Find Projects' },
@@ -20,7 +21,7 @@ export const categoryFilters = [
   "Blockchain",
   "E-commerce",
   "Chatbots"
-]
+];
 
 export const footerLinks = [
   {

@@ -1,8 +1,7 @@
+
 "use client";
 
 import { useRouter } from "next/navigation";
-
-import Button from "./Button";
 
 type Props = {
     startCursor: string
@@ -16,7 +15,7 @@ const LoadMore = ({ startCursor, endCursor, hasPreviousPage, hasNextPage }: Prop
 
     const handleNavigation = (type: string) => {
         const currentParams = new URLSearchParams(window.location.search);
-
+        
         if (type === "prev" && hasPreviousPage) {
             currentParams.delete("endcursor");
             currentParams.set("startcursor", startCursor);
@@ -34,10 +33,14 @@ const LoadMore = ({ startCursor, endCursor, hasPreviousPage, hasNextPage }: Prop
     return (
         <div className="w-full flexCenter gap-5 mt-10">
             {hasPreviousPage && (
-                <Button title="First Page" handleClick={() => handleNavigation('prev')} />
+                <button className="flexCenter gap-1 px-4 py-3 rounded-lg text-sm font-medium bg-light-white-300 text-gray-100 hover:bg-white" onClick={() => handleNavigation("prev")}>
+                    <span>Previous</span>
+                </button>
             )}
             {hasNextPage && (
-                <Button title="Next Shots" handleClick={() => handleNavigation('next')} />
+                <button className="flexCenter gap-1 px-4 py-3 rounded-lg text-sm font-medium bg-light-white-300 text-gray-100 hover:bg-white" onClick={() => handleNavigation("next")}>
+                    <span>Next</span>
+                </button>
             )}
         </div>
     );
