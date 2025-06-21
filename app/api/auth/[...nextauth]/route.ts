@@ -19,27 +19,24 @@ const handler = NextAuth({
       try {
         await connectMongoose();
         const sessionUser = await User.findOne({ email: session.user?.email });
-        
+
         if (sessionUser) {
           session.user = {
             ...session.user,
-            // You can define and make sure that id is part of the user structure, 
-            // or avoid adding it if not necessary.
             id: sessionUser._id.toString(),
           };
         }
       } catch (error) {
         console.error("Session callback error:", error);
       }
-      
+
       return session;
     },
     async signIn({ user }) {
       try {
         await connectMongoose();
-        
         const userExists = await User.findOne({ email: user.email });
-        
+
         if (!userExists) {
           await User.create({
             email: user.email,
@@ -47,7 +44,7 @@ const handler = NextAuth({
             avatarUrl: user.image,
           });
         }
-        
+
         return true;
       } catch (error) {
         console.error("SignIn callback error:", error);
@@ -61,5 +58,4 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
 });
 
-// Export GET and POST handlers
 export { handler as GET, handler as POST };
