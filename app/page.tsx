@@ -2,11 +2,11 @@ import { ProjectInterface } from "@/common.types";
 import Categories from "@/components/Categories";
 import LoadMore from "@/components/LoadMore";
 import ProjectCard from "@/components/ProjectCard";
-import { fetchAllProjects } from "@/lib/actions";
+import { getProjects } from "@/graphql";
 
 type SearchParams = {
   category?: string | null;
-  endcursor?: string | null;
+  endCursor?: string | null;
 }
 
 type Props = {
@@ -29,27 +29,16 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 0;
 
-const Home = async ({ searchParams: { category, endcursor } }: Props) => {
-  const data = await fetchAllProjects(category, endcursor) as ProjectSearch;
+const Home = async ({ searchParams: { category, endCursor } }: Props) => {
+  const data = await getProjects(category, endCursor) as ProjectSearch;
 
   const projectsToDisplay = data?.projectSearch?.edges || [];
 
-  if (!data?.projectSearch?.edges || data?.projectSearch?.edges?.length === 0) {
+  if (projectsToDisplay.length === 0) {
     return (
       <section className="flexStart flex-col paddings">
         <Categories />
-        <div className="text-center py-20">
-          <h2 className="text-2xl font-bold mb-4">No projects found</h2>
-          <p className="text-gray-600 mb-6">
-            {category 
-              ? `No projects found in the "${category}" category.` 
-              : "No projects available yet."
-            }
-          </p>
-          <p className="text-gray-500">
-            Be the first to share your amazing project with the community!
-          </p>
-        </div>
+        <p className="no-result-text text-center">No projects found, go create some first.</p>
       </section>
     )
   }
@@ -57,7 +46,6 @@ const Home = async ({ searchParams: { category, endcursor } }: Props) => {
   return (
     <section className="flexStart flex-col paddings mb-16">
       <Categories />
-
       <section className="projects-grid">
         {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (
           <ProjectCard
@@ -71,7 +59,6 @@ const Home = async ({ searchParams: { category, endcursor } }: Props) => {
           />
         ))}
       </section>
-
       <LoadMore 
         startCursor={data?.projectSearch?.pageInfo?.startCursor} 
         endCursor={data?.projectSearch?.pageInfo?.endCursor} 
@@ -79,7 +66,7 @@ const Home = async ({ searchParams: { category, endcursor } }: Props) => {
         hasNextPage={data?.projectSearch?.pageInfo.hasNextPage}
       />
     </section>
-  )
+  );
 };
 
 export default Home;
