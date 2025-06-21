@@ -1,26 +1,25 @@
+import mongoose from "mongoose";
 
-import mongoose from 'mongoose';
-
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/flexibble';
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/flexibble";
 
 export async function connectMongoose() {
-  if (mongoose.connections[0].readyState === 1) {
-    console.log('Already connected to MongoDB');
+  if (mongoose.connection.readyState === 1) {
     return;
   }
 
   try {
-    console.log('Connecting to MongoDB...');
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 20000, // 20 seconds
-      socketTimeoutMS: 45000, // 45 seconds
+      serverSelectionTimeoutMS: 20000,
+      socketTimeoutMS: 45000,
       maxPoolSize: 10,
       minPoolSize: 5,
-      family: 4 // Use IPv4, skip trying IPv6
+      family: 4,
+      dbName: "flexibble", // optional
     });
-    console.log('✅ Connected to MongoDB with Mongoose');
+    console.log("✅ MongoDB connected");
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error("❌ MongoDB connection error:", error);
     throw error;
   }
 }
