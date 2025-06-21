@@ -21,7 +21,13 @@ export const authOptions: NextAuthOptions = {
         if (sessionUser) {
           session.user = {
             ...session.user,
-            id: sessionUser._id.toString(),
+            interface SessionUser {
+  id: string; // or number, depending on your schema
+  name: string;
+  email: string;
+  // add other expected fields
+}
+
             avatarUrl: sessionUser.avatarUrl,
           };
         }
