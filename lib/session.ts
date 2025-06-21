@@ -1,5 +1,7 @@
+// lib/session.ts
+
 import { getServerSession } from "next-auth/next";
-import { NextAuthOptions, User } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { connectMongoose } from "./mongodb";
 import UserModel from "@/models/User";
@@ -13,41 +15,34 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      // Persist custom user info into token
-      if (user) {
-        token.id = (user as any).id;
-        token.avatarUrl = (user as any).avatarUrl;
-      }
-      return token;
-    },
+    async session({ session }) {
+      try {
+        await connectMongoose();
+        const sessionUser = await UserModel.findOne({ email: session.user?.email });
 
-    async session({ session, token }) {
-      // Attach custom fields from token to session
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.avatarUrl = token.avatarUrl as string;
+        if (sessionUser && session.user) {
+          session.user.id = sessionUser._id.toString();
+          session.user.avatarUrl = sessionUser.avatarUrl;
+        }
+      } catch (error) {
+        console.error("Session callback error:", error);
       }
+
       return session;
     },
 
-    async signIn({ user }: { user: User }) {
+    async signIn({ user }) {
       try {
         await connectMongoose();
 
         const existingUser = await UserModel.findOne({ email: user.email });
 
         if (!existingUser) {
-          const newUser = await UserModel.create({
+          await UserModel.create({
             email: user.email,
             name: user.name,
             avatarUrl: user.image,
           });
-          user.id = newUser._id.toString();
-          user.avatarUrl = newUser.avatarUrl;
-        } else {
-          user.id = existingUser._id.toString();
-          user.avatarUrl = existingUser.avatarUrl;
         }
 
         return true;
