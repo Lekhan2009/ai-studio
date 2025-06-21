@@ -3,10 +3,14 @@ const nextConfig = {
   images: {
     domains: ['lh3.googleusercontent.com', 'res.cloudinary.com', 'images.unsplash.com']
   },
+  // You can uncomment this if you're intentionally using experimental features
+  // Make sure they're supported and needed before using them in production
+  /*
   experimental: {
     serverComponentsExternalPackages: ['mongoose'],
     esmExternals: 'loose'
   },
+  */
   webpack: (config) => {
     config.externals.push({
       'utf-8-validate': 'commonjs utf-8-validate',
@@ -21,8 +25,7 @@ const nextConfig = {
       'mongodb-client-encryption': 'commonjs mongodb-client-encryption'
     });
     return config;
-  },
-  
-}
+  }
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
