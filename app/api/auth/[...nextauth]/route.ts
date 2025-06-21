@@ -17,13 +17,15 @@ const handler = NextAuth({
   callbacks: {
     async session({ session }) {
       try {
-        await connectMongoose(); // Ensure database connection
+        await connectMongoose();
         const sessionUser = await User.findOne({ email: session.user?.email });
         
         if (sessionUser) {
           session.user = {
             ...session.user,
-            id: sessionUser._id.toString(), // Add user ID to session
+            // You can define and make sure that id is part of the user structure, 
+            // or avoid adding it if not necessary.
+            id: sessionUser._id.toString(),
           };
         }
       } catch (error) {
@@ -34,7 +36,7 @@ const handler = NextAuth({
     },
     async signIn({ user }) {
       try {
-        await connectMongoose(); // Ensure database connection
+        await connectMongoose();
         
         const userExists = await User.findOne({ email: user.email });
         
@@ -46,17 +48,17 @@ const handler = NextAuth({
           });
         }
         
-        return true; // Allow sign-in
+        return true;
       } catch (error) {
         console.error("SignIn callback error:", error);
-        return false; // Prevent sign-in
+        return false;
       }
     },
   },
   pages: {
-    signIn: "/", // Custom sign-in page
+    signIn: "/",
   },
-  secret: process.env.NEXTAUTH_SECRET, // JWT secret
+  secret: process.env.NEXTAUTH_SECRET,
 });
 
 // Export GET and POST handlers
