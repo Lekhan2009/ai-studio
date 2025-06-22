@@ -1,32 +1,31 @@
 import mongoose, { Mongoose } from 'mongoose';
 
 declare global {
-  // Avoid duplicate mongoose connection in development
   var mongooseGlobal: {
     conn: Mongoose | null;
     promise: Promise<Mongoose> | null;
-  };
+  } | undefined;
 }
 
-// Use a global variable only in development (to avoid reinitialization during hot reloads)
-let cached = globalThis.mongooseGlobal;
+let cached = global.mongooseGlobal;
 
 if (!cached) {
-  cached = globalThis.mongooseGlobal = { conn: null, promise: null };
+  cached = global.mongooseGlobal = { conn: null, promise: null };
 }
 
+// ✅ Explicitly assert type after null check
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
-  throw new Error('Please define the MONGODB_URI environment variable');
+  throw new Error('❌ MONGODB_URI is not defined in your environment variables');
 }
 
 export async function connectMongoose(): Promise<Mongoose> {
-  if (cached.conn) {
+  if (cached?.conn) {
     return cached.conn;
   }
 
-  if (!cached.promise) {
+  if (!cached?.promise) {
     const opts = {
       bufferCommands: false,
     };
@@ -36,9 +35,9 @@ export async function connectMongoose(): Promise<Mongoose> {
 
   try {
     cached.conn = await cached.promise;
-  } catch (error) {
+  } catch (err) {
     cached.promise = null;
-    throw error;
+    throw err;
   }
 
   return cached.conn;
