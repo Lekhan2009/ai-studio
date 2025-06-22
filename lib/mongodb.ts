@@ -1,12 +1,11 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
+if (!uri) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Global cache (prevents re-creating connection in dev)
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -17,11 +16,10 @@ export async function connectMongoose() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
+    const opts = { bufferCommands: false };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => mongoose);
+    // Now using the type-safe `uri`
+    cached.promise = mongoose.connect(uri, opts).then((mongoose) => mongoose);
   }
 
   try {
