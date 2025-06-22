@@ -1,32 +1,44 @@
 import mongoose from 'mongoose';
 
-const uri = process.env.MONGODB_URI;
+declare global {
+  // Prevent TypeScript error in global scope
+  // when using hot reload in development
+  var mongoose: {
+    conn: mongoose.Connection | null;
+    promise: Promise<mongoose.Mongoose> | null;
+  };
+}
+
+// Assign MONGODB_URI and validate it
+const uri: string = process.env.MONGODB_URI as string;
 
 if (!uri) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-let cached = (global as any).mongoose;
+// Use global cache to avoid re-connecting on every API route load (useful for serverless)
+let cached = global.mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
 export async function connectMongoose() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    const opts = { bufferCommands: false };
+    const opts = {
+      bufferCommands: false,
+    };
 
-    // Now using the type-safe `uri`
     cached.promise = mongoose.connect(uri, opts).then((mongoose) => mongoose);
   }
 
   try {
     cached.conn = await cached.promise;
-  } catch (err) {
+  } catch (error) {
     cached.promise = null;
-    throw err;
+    throw error;
   }
 
   return cached.conn;
